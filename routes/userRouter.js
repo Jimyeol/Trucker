@@ -41,5 +41,22 @@ userRouter.get('/register', (req, res) => {
     res.redirect('/main');
 });
 
+userRouter.post('/regcargo', async (req, res) => {
+    try {
+        console.log(req.body);
+        res.status(200).send('hi');
+    } catch(err) {
+
+    }
+});
+
+userRouter.post('/delcargo', async (req, res) => {
+    try {
+        //get Company index number -> select enrolled cargo list
+    } catch (err) {
+
+    }
+})
+
 
 module.exports = userRouter;

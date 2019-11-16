@@ -5,20 +5,37 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel='stylesheet' href='/stylesheets/modal.css' />
+    <script src="https://code.jquery.com/jquery-3.4.1.js" integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU=" crossorigin="anonymous"></script>
     <title>Main Page</title>
 </head>
 <body>
-    <button id="myBtn">화물등록</button>
+    <button id="cargo">화물등록</button>
+    <button id='delcargo'>화물 등록 취소</button>
+    <button id='callcargo'>운송 내역 조회</button>
+    <button id='token'>토큰 구매</button>
 
-    <!-- The Modal -->
-    <div id="myModal" class="modal">
-    
+
+    <!-- Enroll Cargo -->
+    <div id="cargoModal" class="modal">
       <!-- Modal content -->
       <div class="modal-content">
         <span class="close">&times;</span>
-        <p>Some text in the Modal..</p>
+        <p>상차지: <input type='text' name='cargoup' id='cargoup' value=''></p>
+        <p>하차지: <input type='text' name='cargodown' id='cargodown' value=''></p>
+        <p>톤 수 : <input type='text' name='tons' id='tons' value=''></p>
+        <p>적재중량: <input type='text' name='weight' id='weight' value=''></p>
+        <p>운송비: <input type='text' name='payment' id='payment' value=''></p>
+        <button type='button' id='regcargo'>화물 등록</button>
       </div>
-    
+    </div>
+
+    <!-- Delete Cargo -->
+    <div id="delcargoModal" class="modal">
+      <!-- Modal content -->
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        
+      </div>
     </div>
 
 </body>
