@@ -1,4 +1,4 @@
-docker exec cli peer chaincode install -n truck -v 1.0 -p github.com/bacc/
+docker exec cli peer chaincode install -n cargo -v 1.0 -p github.com/bacc/
 
 
 export CORE_PEER_LOCALMSPID=Org2MSP
@@ -28,14 +28,14 @@ docker exec cli peer chaincode install -n truck -v 1.0 -p github.com/bacc/
 
 
 
-docker exec cli peer chaincode instantiate -v 1.0 -C trucker -n truck -c '{"Args":["Init"]}' -P 'OR ("Org1MSP.member", "Org2MSP.member")'
-docker exec cli peer chaincode invoke -o orderer.trucker.com:7050 -C trucker -n truck -c '{"Args":["addUser","00000000000"]}'
-docker exec cli peer chaincode invoke -o orderer.trucker.com:7050 -C trucker -n truck -c '{"Args":["addBattery","00000000000","10%","39%","77","경기도 화성시"]}'
-docker exec cli peer chaincode query -C trucker -n truck -c '{"Args":["getBattery","00000000000"]}'
-docker exec cli peer chaincode query -C trucker -n truck -c '{"Args":["getAllBattery"]}'
+docker exec cli peer chaincode instantiate -v 1.0 -C trucker -n cargo -c '{"Args":["Init"]}' -P 'OR ("Org1MSP.member", "Org2MSP.member")'
+docker exec cli peer chaincode invoke -o orderer.trucker.com:7050 -C trucker -n cargo -c '{"Args":["addUser","00000000000"]}'
+docker exec cli peer chaincode invoke -o orderer.trucker.com:7050 -C trucker -n cargo -c '{"Args":["addTruck","00000000000","인천","서울","1T","트럭","300kg","편도","70000"]}'
+docker exec cli peer chaincode query -C trucker -n cargo -c '{"Args":["getTruck","00000000000"]}'
+docker exec cli peer chaincode query -C trucker -n cargo -c '{"Args":["getAllTruck"]}'
+docker exec cli peer chaincode query -C trucker -n cargo -c '{"Args":["getHistory","00000000000"]}'
 
 
-#docker logs peer0.org2.trucker.com 2>&1 | grep -i -a -E 'private|pvt|privdata'
 
 echo '-------------------------------------END-------------------------------------'
 
