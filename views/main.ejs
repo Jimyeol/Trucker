@@ -12,7 +12,7 @@
     <button id="cargo">화물등록</button>
     <button id='delcargo'>화물 등록 취소</button>
     <button id='callcargo'>운송 내역 조회</button>
-    <button id='token'>토큰 구매</button>
+    <button id='token' ><a href='/token'>토큰 구매</a></button>
 
 
     <!-- Enroll Cargo -->
@@ -20,11 +20,12 @@
       <!-- Modal content -->
       <div class="modal-content">
         <span class="close">&times;</span>
-        <p>상차지: <input type='text' name='cargoup' id='cargoup' value=''></p>
-        <p>하차지: <input type='text' name='cargodown' id='cargodown' value=''></p>
-        <p>톤 수 : <input type='text' name='tons' id='tons' value=''></p>
+        <p>상차지: <input type='text' name='startpoint' id='startpoint' value=''></p>
+        <p>하차지: <input type='text' name='endpoint' id='endpoint' value=''></p>
+        <p>톤 수 : <input type='text' name='carweight' id='carweight' value=''></p>
         <p>적재중량: <input type='text' name='weight' id='weight' value=''></p>
-        <p>운송비: <input type='text' name='payment' id='payment' value=''></p>
+        <p>운행방법: <input type='text' name='transport' id='transport' value=''></p>
+        <p>운송비: <input type='text' name='cost' id='cost' value=''></p>
         <button type='button' id='regcargo'>화물 등록</button>
       </div>
     </div>
@@ -40,13 +41,52 @@
 
 </body>
 <script>
-  $(document).ready(async () => {
+  $('#regcargo').click( async () => {
+    var startpoint = document.getElementById('startpoint').value;
+    var endpoint = document.getElementById('endpoint').value;
+    var carweight = document.getElementById('carweight').value;
+    var weight = document.getElementById('weight').value;
+    var transport = document.getElementById('transport').value;
+    var cost = document.getElementById('cost').value;
+  
     try {
-      await fetch('http://localhost:3000/main')
+      const response = await fetch('http://localhost:3000/regcargo', {
+        method: 'post',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({startpoint: startpoint, endpoint: endpoint, carweight: carweight, weight: weight, transport: transport, cost: cost})
+      });
+
+      if(response.ok) {
+        window.alert('Cargo Registration Completed');
+
+      } else {
+        window.alert('Cargo Registration Failed');
+      }
     } catch (err) {
-      window.alert('Page Load Err')
+      console.log(err);
     }
-  })
+  });
+
+  $('#delcargo').click( async () => {
+    try {
+      const response = await fetch('http://localhost:3000/delcargo', {
+        method: 'post',
+        headers: {
+          'Content-Type' : 'application/json',
+        },
+        
+      })
+      if(response.ok) {
+        const json = await response.json();
+        console.log(json[0]);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  });
+
 </script>
 <%- include ../public/javascripts/modal.ejs %>
 </html>

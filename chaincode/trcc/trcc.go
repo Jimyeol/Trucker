@@ -27,12 +27,10 @@ type Truck struct {
 	Key string `json:"key"` // 키
 	StartPoint string `json:"startpoint"` // 출발지
 	EndPoint string `json:"endpoint"` // 도착지 
-	CarWeight string `json:"carweight"`  // 차 톤수
-	Car string `json:"car"` // 차 종류
+	CarWeight string `json:"carweight"`  // 차 톤
 	Weight string `json:"weight"`   // 적재 중량
 	TransPort string `json:"transport"` // 운행방법 1:편도 2:왕복
 	Cost string `json:"cost"` // 금액 
-	Average string `json:"average"` // 평균 금액
 	Date string `json:"date"` // 완료 시간 
 }
 
@@ -78,7 +76,7 @@ func (s *ChainCode) Invoke(APIstub shim.ChaincodeStubInterface) sc.Response {
 
 // 데이터 입력
 func (s *ChainCode) addTruck(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
-	if len(args) != 8 {
+	if len(args) != 6 {
 		return shim.Error("Incorrect number of arguments. Expecting 8")
 	}
 	// 유저 정보 가져오기
@@ -100,7 +98,7 @@ func (s *ChainCode) addTruck(APIstub shim.ChaincodeStubInterface, args []string)
 	// 배터리 구조체 값 업데이트
 	// avg, _ := strconv.ParseFloat(args[6],64)
 	// truck.Average=append(truck.Average,avg)
-	var data = Truck{Key:args[0],StartPoint:args[1], EndPoint:args[2], CarWeight:args[3], Car:args[4], Weight:args[5], TransPort:args[6], Cost:args[7], Average:args[7] , Date:time.Now().Format("20060102150405") }
+	var data = Truck{Key:args[0],StartPoint:args[1], EndPoint:args[2], CarWeight:args[3], Weight:args[4], TransPort:args[5], Cost:args[6] , Date:time.Now().Format("20060102150405") }
 	userAsBytes,_:=json.Marshal(data)
 
 	// 월드스테이드 업데이트 
