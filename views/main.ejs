@@ -39,5 +39,14 @@
     </div>
 
 </body>
+<script>
+  $(document).ready(async () => {
+    try {
+      await fetch('http://localhost:3000/main')
+    } catch (err) {
+      window.alert('Page Load Err')
+    }
+  })
+</script>
 <%- include ../public/javascripts/modal.ejs %>
 </html>

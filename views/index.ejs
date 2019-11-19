@@ -16,7 +16,6 @@
             </div>
             <div class="content">
                 <div class="signin-cont cont">
-                    <form action='/login' method='post'>
                         <label for="email">Your phonenumber</label>
                         <input type="text" name="phonenumber" id="lgnPN" value='' class="inpt" placeholder="Your phonenumber">
                         <label for="password">Your password</label>
@@ -24,23 +23,19 @@
                         <label for="remember">Remember me</label>
                         <input type="checkbox" id="remember" class="checkbox" checked>
                         <button type='submit' id='signin'>Sign in</button>
-                    </form>
                         <!-- <div class="submit-wrap">
                             <input type="submit" value="Sign in" class="submit">
                             <a href="#" class="more">Forgot your password?</a>
                         </div> -->
                 </div>
                 <div class="signup-cont cont">
-                    <form action='/register' method='post'>
                         <label for="name">Your name</label>
                         <input type="text" name="name" id="name" class="inpt" placeholder="Your name">
                         <label for="email">Your phonenumber</label>
                         <input type="text" name="phonenumber" id="regPN" class="inpt" placeholder="Your phonenumber">
                         <label for="password">Your password</label>
                         <input type="password" name="password" id="regPW" class="inpt" placeholder="Your password">
-                        <input type="submit" value="Sign up" class="submit">
                         <button type='submit' id='signup'>Sign up</button>
-                    </form>
                         <!-- <div class="submit-wrap">
                             <input type="submit" value="Sign up" class="submit">
                             <a href="#" class="more">Terms and conditions</a>
@@ -71,21 +66,49 @@ $('.tabs .tab').click(function(){
         $('.signup-cont').show();
     }
 });
-// $('#signin').click(async function() {
-//     var lgnPN = document.getElementById('lgnPN').value;
-//     var lgnPW = document.getElementById('lgnPW').value;
-//     try {
-//         const response = await fetch('http://localhost:3000/login', {
-//                method: 'post',
-//                headers: {
-//                   "Content-Type": "application/json"
-//                },
-//                body: JSON.stringify({user : lgnPN, password : lgnPW}),
-//             });
-//     } catch (err) {
-//         window.alert('login 정보를 확인해주세요!');
-//     }
-// })
+$('#signin').click(async function() {
+    var lgnPN = document.getElementById('lgnPN').value;
+    var lgnPW = document.getElementById('lgnPW').value;
+    try {
+        const response = await fetch('http://localhost:3000/login', {
+               method: 'post',
+               headers: {
+                  "Content-Type": "application/json"
+               },
+               body: JSON.stringify({ca: 'web', user : lgnPN, password : lgnPW}),
+            });
+
+            if(response.ok) {
+                window.location.assign('http://localhost:3000/main');
+            } else {
+                window.alert('Login Failed');
+            }
+    } catch (err) {
+        window.alert('login 정보를 확인해주세요!');
+    }
+});
+
+$('#signup').click(async function() {
+    var regPN = document.getElementById('regPN').value;
+    var regPW = document.getElementById('regPW').value;
+    try {
+        const response = await fetch('http://localhost:3000/register', {
+               method: 'post',
+               headers: {
+                  "Content-Type": "application/json"
+               },
+               body: JSON.stringify({ca: 'web', user : regPN, password : regPW}),
+            });
+
+            if(response.ok) {
+                window.location.assign('http://localhost:3000/main');
+            } else {
+                window.alert('Login Failed');
+            }
+    } catch (err) {
+        window.alert('login 정보를 확인해주세요!');
+    }
+})
 
 </script>
 </html>
