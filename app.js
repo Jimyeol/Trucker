@@ -8,6 +8,17 @@ var routers = require('./routes/routers');
 
 var app = express();
 
+//sessions
+const session = require('express-session');
+const FileStore = require('session-file-store')(session);
+
+app.use(session({
+  secret: 'keyboard cat',
+  resave: false,
+  saveUninitialized: true,
+  store: new FileStore(),
+}));
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');

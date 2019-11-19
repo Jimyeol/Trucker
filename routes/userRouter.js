@@ -1,44 +1,37 @@
 var express = require('express');
 var userRouter = express.Router();
 
-//sessions
-const session = require('express-session');
-const FileStore = require('session-file-store')(session);
-
-userRouter.use(session({
-    secret: 'keyboard cat',
-    resave: false,
-    saveUninitialized: true,
-    store: new FileStore(),
-}));
-
 //Middleware
 var userModel = require('../model/userModel');
 
-userRouter.get('/', (req, res, next) => {
-    res.render('index.ejs');
-})
 
-userRouter.post('/login', (req, res) => {
+
+userRouter.get('/', (req, res, next) => {
+    res.render('index.ejs')
+});
+
+userRouter.post('/login', async (req, res) => {
+    try {
         console.log(req.body);
-        //DB 측 login 정보 Match
-        // var result = await userModel.login(req);
-        req.session.user = {
-            user : 'hi',
-        }
-        console.log('hi');
-        res.redirect('/main');
+        await userModel.login(req);
+        res.status(200).send(true);
+    } catch(err) {
+        res.status(500).send(false);
+    }
 });
 
 userRouter.get('/main', (req, res) => {
-    console.log(req.session.user);
     res.render('main.ejs')
 });
 
-userRouter.get('/register', (req, res) => {
-    userModel.register(req);
-    //req.session.user 형성
-    res.redirect('/main');
+userRouter.post('/register', async (req, res) => {
+    try {
+        console.log(req.body);
+        await userModel.register(req);
+        res.status(200).send(req.session.user)
+    } catch(err) {
+        console.log(err);
+    }
 });
 
 userRouter.post('/regcargo', async (req, res) => {
@@ -56,7 +49,6 @@ userRouter.post('/delcargo', async (req, res) => {
     } catch (err) {
 
     }
-})
-
+});
 
 module.exports = userRouter;
