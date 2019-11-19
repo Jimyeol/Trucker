@@ -57,3 +57,17 @@ sleep 5
 # peer0.org3.trucker.com 채널 참여
 docker exec -e "CORE_PEER_LOCALMSPID=Org3MSP" -e "CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/msp/users/Admin@org3.trucker.com/msp" peer0.org3.trucker.com peer channel join -b /etc/hyperledger/configtx/trucker.block
 sleep 5
+
+
+docker exec cli peer chaincode install -n cargo -v 1.0 -p github.com/trcc/
+docker exec cli peer chaincode instantiate -v 1.0 -C trucker -n cargo -c '{"Args":["Init"]}' -P 'OR ("Org1MSP.member", "Org2MSP.member")'
+sleep 10
+docker exec cli peer chaincode invoke -o orderer.trucker.com:7050 -C trucker -n cargo -c '{"Args":["addTruck","0","인천","서울","1T","트럭","300kg","편도","70000"]}'
+docker exec cli peer chaincode invoke -o orderer.trucker.com:7050 -C trucker -n cargo -c '{"Args":["addTruck","0","인천","서울","1T","트럭","300kg","편도","80000"]}'
+docker exec cli peer chaincode invoke -o orderer.trucker.com:7050 -C trucker -n cargo -c '{"Args":["addTruck","0","인천","서울","1T","트럭","300kg","편도","90000"]}'
+docker exec cli peer chaincode invoke -o orderer.trucker.com:7050 -C trucker -n cargo -c '{"Args":["addTruck","1","인천","서울","1T","트럭","300kg","편도","70000"]}'
+docker exec cli peer chaincode invoke -o orderer.trucker.com:7050 -C trucker -n cargo -c '{"Args":["addTruck","2","인천","서울","1T","트럭","300kg","편도","70000"]}'
+sleep 3
+docker exec cli peer chaincode query -C trucker -n cargo -c '{"Args":["getTruck","1"]}'
+docker exec cli peer chaincode query -C trucker -n cargo -c '{"Args":["getAllTruck"]}'
+docker exec cli peer chaincode query -C trucker -n cargo -c '{"Args":["getHistory","0"]}'
