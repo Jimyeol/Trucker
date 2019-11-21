@@ -15,13 +15,13 @@ class Cargo {
         )
     }
 
-    callAllCargo(data) {
+    callAllCargo() {
         return new Promise (
             async (resolve, reject) => {
                 try {
-                    console.log(data);
-                    var sql = 'SELECT * FROM cargodb WHERE company = ?';
-                    var result = myConnection.query(sql, [data.userID]);
+                    var sql = 'SELECT * FROM cargodb';
+                    var result = myConnection.query(sql);
+                    console.log(result[0]);
                     resolve(result);
                 } catch(err) {
                     reject(err);

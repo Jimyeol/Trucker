@@ -17,7 +17,6 @@ class registerUserTest {
         return new Promise (
             async (resolve, reject) => {
             try {
-                console.log('id: ', data);
                 // Create a new file system based wallet for managing identities.
                 const walletPath = path.join(process.cwd(), 'wallet');
                 const wallet = new FileSystemWallet(walletPath);

@@ -16,10 +16,18 @@ class  User {
                     if(ca == 'web') {
                         const sql = `SELECT * FROM companydb WHERE phonenumber = ? AND password = ?`;
                         var result = await myConnection.query(sql, [InsertedUser, InsertedPassword]);
+                        
                         resolve(result[0][0]);
                     } else {
                         const sql = `SELECT * FROM driverdb WHERE phonenumber = ? AND password = ?`;
                         var result = await myConnection.query(sql, [InsertedUser, InsertedPassword]);
+                        req.session.user = {
+                            userID: result[0][0].phonenumber,
+                            userNM: result[0][0].name,
+                            userCN: result[0][0].carnumber,
+                            userCW: result[0][0].carweight,
+                            userWallet: result[0][0].wallet,
+                        }
                         resolve(result[0][0]);
                     }
                 } catch (err) {
@@ -30,9 +38,20 @@ class  User {
     }
 
     register(req) {
-        var ca = req.body.ca;
-        var InsertedUser = req.body.phonenumber;
-        var InsertedPassword = req.body.password;
+        if(req.body.ca == 'web') {
+            var ca = req.body.ca;
+            var InsertedUser = req.body.phonenumber;
+            var InsertedPassword = req.body.password;
+            var InsertedName = req.body.username;
+        }
+        if(req.body.ca == 'app') {
+            var ca = req.body.ca;
+            var InsertedUser = req.body.phonenumber;
+            var InsertedPassword = req.body.password;
+            var InsertedName = req.body.username;
+            var InsertedCarnumber = req.body.carnumber;
+            var InsertedCarweight = req.body.carweight;
+        } 
         return new Promise(
             async (resolve, reject) => {
                 try {
@@ -52,20 +71,24 @@ class  User {
                             if(ca == 'web') {
                                 // var web3Data = await web3js.makeAccounts(InsertedPassword);
                                 var web3Data = 'wallet'
-                                const sql = 'INSERT INTO companydb (phonenumber, password, wallet) values (?, ?, ?)';
-                                await myConnection.query(sql, [InsertedUser, InsertedPassword, web3Data]);
+                                const sql = 'INSERT INTO companydb (phonenumber,name, password, wallet) values (?, ?, ?, ?)';
+                                await myConnection.query(sql, [InsertedUser,InsertedName, InsertedPassword, web3Data]);
                                 req.session.user = {
                                     userID: InsertedUser,
+                                    userNM: InsertedName,
                                     userWallet: web3Data,
                                 }
                             resolve(req.session.user);
                             } else {
                                 // var web3Data = await web3js.makeAccounts(InsertedPassword);
                                 var web3Data = 'wallet'
-                                const sql = 'INSERT INTO driverdb (phonenumber, password, wallet) values (?, ?, ?)';
-                                await myConnection.query(sql, [InsertedUser, InsertedPassword, web3Data]);
+                                const sql = 'INSERT INTO driverdb (phonenumber, name, carnumber,carweight, password, wallet) values (?, ?, ?, ?, ?, ?)';
+                                await myConnection.query(sql, [InsertedUser, InsertedName, InsertedCarnumber,InsertedCarweight, InsertedPassword, web3Data]);
                                 req.session.user = {
                                     userID: InsertedUser,
+                                    userNM: InsertedName,
+                                    userCN: InsertedCarnumber,
+                                    userCW: InsertedCarweight,
                                     userWallet: web3Data,
                                 }
                                 resolve(req.session.user);
