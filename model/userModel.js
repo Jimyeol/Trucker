@@ -1,20 +1,24 @@
 var myConnection = require('../dbConfig.js');
+var web3js = require('./web3');
+// var Contract = require('./abi');
+// var myContract = Contract.myContract;
+// var web3 = Contract.web3;
 
 
 class  User {
     login(req) {
         var ca = req.body.ca;
-        var InsertedUser = req.body.user;
+        var InsertedUser = req.body.phonenumber;
         var InsertedPassword = req.body.password;
         return new Promise(
             async (resolve, reject) => {
                 try {
                     if(ca == 'web') {
-                        const sql = `SELECT * FROM companydb WHERE user = ? AND password = ?`;
+                        const sql = `SELECT * FROM companydb WHERE phonenumber = ? AND password = ?`;
                         var result = await myConnection.query(sql, [InsertedUser, InsertedPassword]);
                         resolve(result[0][0]);
                     } else {
-                        const sql = `SELECT * FROM driverdb WHERE user = ? AND password = ?`;
+                        const sql = `SELECT * FROM driverdb WHERE phonenumber = ? AND password = ?`;
                         var result = await myConnection.query(sql, [InsertedUser, InsertedPassword]);
                         resolve(result[0][0]);
                     }
@@ -27,24 +31,69 @@ class  User {
 
     register(req) {
         var ca = req.body.ca;
-        var InsertedUser = req.body.user;
+        var InsertedUser = req.body.phonenumber;
         var InsertedPassword = req.body.password;
         return new Promise(
             async (resolve, reject) => {
                 try {
-
-                    if(ca == 'web') {
-                        const sql = 'INSERT INTO companydb (user, password) values (?, ?)';
-                        await myConnection.query(sql, [InsertedUser, InsertedPassword]);
-                        req.session.user = {
-                            userID: InsertedUser,
+                    var allData = await this.selectAll(ca);
+                    let flags = 0;
+                    console.log('hi1')
+                    for(const content of allData[0]) {
+                        if(content.phonenumber == InsertedUser) {
+                            flags = 1;
+                            break;
                         }
-                    resolve(req.session.user);
-                    } else {
-                        const sql = 'INSERT INTO driverdb (user, password) values (?, ?)';
-                        await myConnection.query(sql, [InsertedUser, InsertedPassword]);
                     }
-                    
+                    console.log('flags : ', flags)
+
+                    switch (flags) {
+                        case 0:
+                            if(ca == 'web') {
+                                // var web3Data = await web3js.makeAccounts(InsertedPassword);
+                                var web3Data = 'wallet'
+                                const sql = 'INSERT INTO companydb (phonenumber, password, wallet) values (?, ?, ?)';
+                                await myConnection.query(sql, [InsertedUser, InsertedPassword, web3Data]);
+                                req.session.user = {
+                                    userID: InsertedUser,
+                                    userWallet: web3Data,
+                                }
+                            resolve(req.session.user);
+                            } else {
+                                // var web3Data = await web3js.makeAccounts(InsertedPassword);
+                                var web3Data = 'wallet'
+                                const sql = 'INSERT INTO driverdb (phonenumber, password, wallet) values (?, ?, ?)';
+                                await myConnection.query(sql, [InsertedUser, InsertedPassword, web3Data]);
+                                req.session.user = {
+                                    userID: InsertedUser,
+                                    userWallet: web3Data,
+                                }
+                                resolve(req.session.user);
+                            }
+                        case 1:
+                            resolve('중복된 아이디입니다.');
+                            break;
+                    }
+                } catch (err) {
+                    reject(err);
+                }
+            }
+        )
+    }
+
+    selectAll(data) {
+        return new Promise(
+            async (resolve, reject) => {
+                try {
+                    if (data == 'web') {
+                        const sql = 'SELECT * FROM companydb';
+                        var result = await myConnection.query(sql);
+                        resolve(result);
+                    } else {
+                        const sql = 'SELECT * FROM driverdb';
+                        var result = await myConnection.query(sql);
+                        resolve(result);
+                    }
                 } catch (err) {
                     reject(err);
                 }

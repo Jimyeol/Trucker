@@ -13,8 +13,9 @@ userRouter.post('/login', async (req, res) => {
     try {
         console.log(req.body);
         var result = await userModel.login(req);
+        console.log(result);
         req.session.user = {
-            userID: result.user,
+            userID: result.phonenumber,
         }
         res.status(200).send(req.session.user);
     } catch(err) {
@@ -28,15 +29,13 @@ userRouter.get('/main', (req, res) => {
 
 userRouter.post('/register', async (req, res) => {
     try {
-        console.log(req.body);
-        await userModel.register(req);
+        console.log('register', req.body);
+        var result = await userModel.register(req);
         await registerUser.registerUser(req.session.user.userID)
-        res.status(200).send(req.session.user)
+        res.status(200).send(result)
     } catch(err) {
         console.log(err);
     }
 });
-
-
 
 module.exports = userRouter;

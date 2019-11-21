@@ -75,7 +75,7 @@ $('#signin').click(async function() {
                headers: {
                   "Content-Type": "application/json"
                },
-               body: JSON.stringify({ca: 'web', user : lgnPN, password : lgnPW}),
+               body: JSON.stringify({ca: 'web', phonenumber : lgnPN, password : lgnPW}),
             });
 
             if(response.ok) {
@@ -97,7 +97,7 @@ $('#signup').click(async function() {
                headers: {
                   "Content-Type": "application/json"
                },
-               body: JSON.stringify({ca: 'web', user : regPN, password : regPW}),
+               body: JSON.stringify({ca: 'web', phonenumber : regPN, password : regPW}),
             });
 
             if(response.ok) {
