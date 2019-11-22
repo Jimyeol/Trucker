@@ -6,6 +6,8 @@ var cargoModel = require('../model/cargoModel');
 
 cargoRouter.post('/regcargo', async (req, res) => {
     try {
+        console.log('regcargo', req.body)
+        console.log(req.session.user)
         var cargodata = {
             companycode: req.session.user.userID,
             startpoint: req.body.startpoint,
@@ -33,8 +35,13 @@ cargoRouter.post('/delcargo', async (req, res) => {
     }
 });
 
-cargoRouter.get('/components/jusoPopup', (req, res) => {
-    res.render('components/juso.ejs');
+cargoRouter.get('/components/jusoPopup/:id', (req, res) => {
+    console.log(req.params)
+    if(req.params.id == 'startpoint') {
+        res.render('components/juso1.ejs');
+    } else {
+        res.render('components/juso2.ejs');
+    }
 })
 
 module.exports = cargoRouter;

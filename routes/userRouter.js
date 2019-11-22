@@ -19,6 +19,18 @@ userRouter.post('/login', async (req, res) => {
     }
 });
 
+userRouter.get('/logout', (req, res) => {
+    console.log('hi')
+    if (req.session.user) {
+        req.session.destroy(err => {
+            console.log('failed: ' + err);
+            return;
+        });
+        console.log('success');
+        res.status(200).redirect('/');
+    } else return;
+});
+
 userRouter.get('/main', (req, res) => {
     res.render('main.ejs')
 });

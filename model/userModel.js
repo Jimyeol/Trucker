@@ -16,7 +16,9 @@ class  User {
                     if(ca == 'web') {
                         const sql = `SELECT * FROM companydb WHERE phonenumber = ? AND password = ?`;
                         var result = await myConnection.query(sql, [InsertedUser, InsertedPassword]);
-                        
+                        req.session.user = {
+                            userID: result[0][0].phonenumber,
+                        }
                         resolve(result[0][0]);
                     } else {
                         const sql = `SELECT * FROM driverdb WHERE phonenumber = ? AND password = ?`;

@@ -13,7 +13,7 @@
     <button id='delcargo'>화물 등록 취소</button>
     <button id='callcargo'>운송 내역 조회</button>
     <button id='token' ><a href='/token'>토큰 구매</a></button>
-
+    <button><a href='/logout'>로그아웃</a></button>
 
     <!-- Enroll Cargo -->
     <div id="cargoModal" class="modal">
@@ -21,8 +21,8 @@
       <div class="modal-content">
         <span class="close">&times;</span>
         <form name="form" id="form">
-        <p>상차지: <input type='text' name='startpoint' id='startpoint' value=''><input type="button" onClick="goPopup();" value="검색"/></p>
-        <p>하차지: <input type='text' name='endpoint' id='endpoint' value=''><input type="button" onClick="goPopup();" value="검색"/></p>
+        <p>상차지: <input type='text' name='startpoint' id='startpoint' value=''><input type="button" onClick="goPopup1();" value="검색"/></p>
+        <p>하차지: <input type='text' name='endpoint' id='endpoint' value=''><input type="button" onClick="goPopup2();" value="검색"/></p>
         <p>톤 수 : <input type='text' name='carweight' id='carweight' value=''></p>
         <p>적재중량: <input type='text' name='weight' id='weight' value=''></p>
         <p>운행방법: <input type='text' name='transport' id='transport' value=''></p>
@@ -43,28 +43,40 @@
 
 </body>
 <script>
-  function goPopup(){
+  function goPopup1(){
 	// 주소검색을 수행할 팝업 페이지를 호출합니다.
 	// 호출된 페이지(jusopopup.jsp)에서 실제 주소검색URL(http://www.juso.go.kr/addrlink/addrLinkUrl.do)를 호출하게 됩니다.
-	  var pop = window.open("/components/jusoPopup","pop","width=570,height=420, scrollbars=yes, resizable=yes"); 
+	  var pop = window.open("/components/jusoPopup/startpoint","pop","width=570,height=420, scrollbars=yes, resizable=yes"); 
 	
 	// 모바일 웹인 경우, 호출된 페이지(jusopopup.jsp)에서 실제 주소검색URL(http://www.juso.go.kr/addrlink/addrMobileLinkUrl.do)를 호출하게 됩니다.
     //var pop = window.open("/popup/jusoPopup.jsp","pop","scrollbars=yes, resizable=yes"); 
   }
-  function jusoCallBack(data){
+  function goPopup2(){
+	// 주소검색을 수행할 팝업 페이지를 호출합니다.
+	// 호출된 페이지(jusopopup.jsp)에서 실제 주소검색URL(http://www.juso.go.kr/addrlink/addrLinkUrl.do)를 호출하게 됩니다.
+	  var pop = window.open("/components/jusoPopup/endpoint","pop","width=570,height=420, scrollbars=yes, resizable=yes"); 
+	
+	// 모바일 웹인 경우, 호출된 페이지(jusopopup.jsp)에서 실제 주소검색URL(http://www.juso.go.kr/addrlink/addrMobileLinkUrl.do)를 호출하게 됩니다.
+    //var pop = window.open("/popup/jusoPopup.jsp","pop","scrollbars=yes, resizable=yes"); 
+  }
+  function jusoCallBack1(data){
     console.log(typeof(data))
     document.form.startpoint.value = data;
   }
-
+  function jusoCallBack2(data){
+    console.log(typeof(data))
+    document.form.endpoint.value = data;
+  }
 
   $('#regcargo').click( async () => {
+    var modal = document.getElementById('cargoModal');
     var startpoint = document.getElementById('startpoint').value;
     var endpoint = document.getElementById('endpoint').value;
     var carweight = document.getElementById('carweight').value;
     var weight = document.getElementById('weight').value;
     var transport = document.getElementById('transport').value;
     var cost = document.getElementById('cost').value;
-  
+    console.log(startpoint);
     try {
       const response = await fetch('http://localhost:3000/regcargo', {
         method: 'post',
@@ -76,6 +88,7 @@
 
       if(response.ok) {
         window.alert('Cargo Registration Completed');
+        modal.style.display = 'none';
 
       } else {
         window.alert('Cargo Registration Failed');
