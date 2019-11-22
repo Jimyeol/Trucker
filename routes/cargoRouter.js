@@ -33,4 +33,8 @@ cargoRouter.post('/delcargo', async (req, res) => {
     }
 });
 
+cargoRouter.get('/components/jusoPopup', (req, res) => {
+    res.render('components/juso.ejs');
+})
+
 module.exports = cargoRouter;
