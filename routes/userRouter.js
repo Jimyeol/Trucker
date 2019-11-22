@@ -3,8 +3,7 @@ var userRouter = express.Router();
 
 //Middleware
 var userModel = require('../model/userModel');
-
-
+var registerUser = require('../model/registerUser');
 
 userRouter.get('/', (req, res, next) => {
     res.render('index.ejs')
@@ -12,12 +11,24 @@ userRouter.get('/', (req, res, next) => {
 
 userRouter.post('/login', async (req, res) => {
     try {
-        console.log(req.body);
         await userModel.login(req);
-        res.status(200).send(true);
+        console.log('login session', req.session.user)
+        res.status(200).send(req.session.user);
     } catch(err) {
         res.status(500).send(false);
     }
+});
+
+userRouter.get('/logout', (req, res) => {
+    console.log('hi')
+    if (req.session.user) {
+        req.session.destroy(err => {
+            console.log('failed: ' + err);
+            return;
+        });
+        console.log('success');
+        res.status(200).redirect('/');
+    } else return;
 });
 
 userRouter.get('/main', (req, res) => {
@@ -26,28 +37,13 @@ userRouter.get('/main', (req, res) => {
 
 userRouter.post('/register', async (req, res) => {
     try {
-        console.log(req.body);
-        await userModel.register(req);
-        res.status(200).send(req.session.user)
+        console.log(req.body)
+        var result = await userModel.register(req);
+        console.log('register', req.session.user)
+        await registerUser.registerUser(req.session.user.userID);
+        res.status(200).send(result)
     } catch(err) {
         console.log(err);
-    }
-});
-
-userRouter.post('/regcargo', async (req, res) => {
-    try {
-        console.log(req.body);
-        res.status(200).send('hi');
-    } catch(err) {
-
-    }
-});
-
-userRouter.post('/delcargo', async (req, res) => {
-    try {
-        //get Company index number -> select enrolled cargo list
-    } catch (err) {
-
     }
 });
 

@@ -1,21 +1,35 @@
 var myConnection = require('../dbConfig.js');
+var web3js = require('./web3');
+// var Contract = require('./abi');
+// var myContract = Contract.myContract;
+// var web3 = Contract.web3;
 
 
 class  User {
     login(req) {
         var ca = req.body.ca;
-        var InsertedUser = req.body.user;
+        var InsertedUser = req.body.phonenumber;
         var InsertedPassword = req.body.password;
         return new Promise(
             async (resolve, reject) => {
                 try {
                     if(ca == 'web') {
-                        const sql = `SELECT * FROM companydb WHERE user = ? AND password = ?`;
+                        const sql = `SELECT * FROM companydb WHERE phonenumber = ? AND password = ?`;
                         var result = await myConnection.query(sql, [InsertedUser, InsertedPassword]);
+                        req.session.user = {
+                            userID: result[0][0].phonenumber,
+                        }
                         resolve(result[0][0]);
                     } else {
-                        const sql = `SELECT * FROM driverdb WHERE user = ? AND password = ?`;
+                        const sql = `SELECT * FROM driverdb WHERE phonenumber = ? AND password = ?`;
                         var result = await myConnection.query(sql, [InsertedUser, InsertedPassword]);
+                        req.session.user = {
+                            userID: result[0][0].phonenumber,
+                            userNM: result[0][0].name,
+                            userCN: result[0][0].carnumber,
+                            userCW: result[0][0].carweight,
+                            userWallet: result[0][0].wallet,
+                        }
                         resolve(result[0][0]);
                     }
                 } catch (err) {
@@ -26,25 +40,85 @@ class  User {
     }
 
     register(req) {
-        var ca = req.body.ca;
-        var InsertedUser = req.body.user;
-        var InsertedPassword = req.body.password;
+        if(req.body.ca == 'web') {
+            var ca = req.body.ca;
+            var InsertedUser = req.body.phonenumber;
+            var InsertedPassword = req.body.password;
+            var InsertedName = req.body.username;
+        }
+        if(req.body.ca == 'app') {
+            var ca = req.body.ca;
+            var InsertedUser = req.body.phonenumber;
+            var InsertedPassword = req.body.password;
+            var InsertedName = req.body.username;
+            var InsertedCarnumber = req.body.carnumber;
+            var InsertedCarweight = req.body.carweight;
+        } 
         return new Promise(
             async (resolve, reject) => {
                 try {
-
-                    if(ca == 'web') {
-                        const sql = 'INSERT INTO companydb (user, password) values (?, ?)';
-                        await myConnection.query(sql, [InsertedUser, InsertedPassword]);
-                        req.session.user = {
-                            userID: InsertedUser,
+                    var allData = await this.selectAll(ca);
+                    let flags = 0;
+                    console.log('hi1')
+                    for(const content of allData[0]) {
+                        if(content.phonenumber == InsertedUser) {
+                            flags = 1;
+                            break;
                         }
-                    resolve(req.session.user);
-                    } else {
-                        const sql = 'INSERT INTO driverdb (user, password) values (?, ?)';
-                        await myConnection.query(sql, [InsertedUser, InsertedPassword]);
                     }
-                    
+                    console.log('flags : ', flags)
+
+                    switch (flags) {
+                        case 0:
+                            if(ca == 'web') {
+                                // var web3Data = await web3js.makeAccounts(InsertedPassword);
+                                var web3Data = 'wallet'
+                                const sql = 'INSERT INTO companydb (phonenumber,name, password, wallet) values (?, ?, ?, ?)';
+                                await myConnection.query(sql, [InsertedUser,InsertedName, InsertedPassword, web3Data]);
+                                req.session.user = {
+                                    userID: InsertedUser,
+                                    userNM: InsertedName,
+                                    userWallet: web3Data,
+                                }
+                            resolve(req.session.user);
+                            } else {
+                                // var web3Data = await web3js.makeAccounts(InsertedPassword);
+                                var web3Data = 'wallet'
+                                const sql = 'INSERT INTO driverdb (phonenumber, name, carnumber,carweight, password, wallet) values (?, ?, ?, ?, ?, ?)';
+                                await myConnection.query(sql, [InsertedUser, InsertedName, InsertedCarnumber,InsertedCarweight, InsertedPassword, web3Data]);
+                                req.session.user = {
+                                    userID: InsertedUser,
+                                    userNM: InsertedName,
+                                    userCN: InsertedCarnumber,
+                                    userCW: InsertedCarweight,
+                                    userWallet: web3Data,
+                                }
+                                resolve(req.session.user);
+                            }
+                        case 1:
+                            resolve('중복된 아이디입니다.');
+                            break;
+                    }
+                } catch (err) {
+                    reject(err);
+                }
+            }
+        )
+    }
+
+    selectAll(data) {
+        return new Promise(
+            async (resolve, reject) => {
+                try {
+                    if (data == 'web') {
+                        const sql = 'SELECT * FROM companydb';
+                        var result = await myConnection.query(sql);
+                        resolve(result);
+                    } else {
+                        const sql = 'SELECT * FROM driverdb';
+                        var result = await myConnection.query(sql);
+                        resolve(result);
+                    }
                 } catch (err) {
                     reject(err);
                 }

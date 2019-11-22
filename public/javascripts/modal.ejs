@@ -19,29 +19,6 @@
         modal.style.display = "none";
         }
     }
-    $('#regcargo').click(async ()=> {
-        var cargoup = document.getElementById('cargoup').value;
-        var cargodown = document.getElementById('cargodown').value;
-        var tons = document.getElementById('tons').value;
-        var weight = document.getElementById('weight').value;
-        try {
-            const response = await fetch('http://localhost:3000/regcargo', {
-                method: 'post',
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({loading: cargoup, landing: cargodown, tons: tons, weight: weight}),
-            })
-            if(response.ok) {
-                console.log('hi');
-            } else {
-                console.log('Error')
-            }
-        } catch (err) {
-            window.alert(err);
-        }
-    })
-
     // Get the modal
     var delmodal = document.getElementById("delcargoModal");
     // Get the button that opens the modal
@@ -62,23 +39,4 @@
         delmodal.style.display = "none";
         }
     }
-    $('#delcargo').click(async () => {
-        try {
-            var response = await fetch('http://localhhost:3000//delcargo', {
-                method: 'post',
-                headers: {
-                    "Content-Type": "application/json"
-                },
-            })
-            if(response.ok) {
-                
-            } else {
-
-            }
-        } catch(err) {
-
-        }
-    })
-
-        
 </script>

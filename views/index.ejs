@@ -30,7 +30,7 @@
                 </div>
                 <div class="signup-cont cont">
                         <label for="name">Your name</label>
-                        <input type="text" name="name" id="name" class="inpt" placeholder="Your name">
+                        <input type="text" name="name" id="regNM" class="inpt" placeholder="Your name">
                         <label for="email">Your phonenumber</label>
                         <input type="text" name="phonenumber" id="regPN" class="inpt" placeholder="Your phonenumber">
                         <label for="password">Your password</label>
@@ -75,7 +75,7 @@ $('#signin').click(async function() {
                headers: {
                   "Content-Type": "application/json"
                },
-               body: JSON.stringify({ca: 'web', user : lgnPN, password : lgnPW}),
+               body: JSON.stringify({ca: 'web', phonenumber : lgnPN, password : lgnPW}),
             });
 
             if(response.ok) {
@@ -91,13 +91,14 @@ $('#signin').click(async function() {
 $('#signup').click(async function() {
     var regPN = document.getElementById('regPN').value;
     var regPW = document.getElementById('regPW').value;
+    var regNM = document.getElementById('regNM').value;
     try {
         const response = await fetch('http://localhost:3000/register', {
                method: 'post',
                headers: {
                   "Content-Type": "application/json"
                },
-               body: JSON.stringify({ca: 'web', user : regPN, password : regPW}),
+               body: JSON.stringify({ca: 'web', phonenumber : regPN, username: regNM, password : regPW}),
             });
 
             if(response.ok) {
