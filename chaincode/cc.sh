@@ -32,6 +32,7 @@ docker exec cli peer chaincode invoke -o orderer.trucker.com:7050 -C trucker -n 
 docker exec cli peer chaincode query -C trucker -n cargo -c '{"Args":["getTruck","00000000000"]}'
 docker exec cli peer chaincode query -C trucker -n cargo -c '{"Args":["getAllTruck"]}'
 docker exec cli peer chaincode query -C trucker -n cargo -c '{"Args":["getHistory","00000000000"]}'
+docker exec cli peer chaincode query -C trucker -n cargo -c '{"Args":["getBatteryValue","인천"]}'
 
 docker exec cli peer chaincode upgrade -v 1.1 -C trucker -n cargo -c '{"Args":["Init"]}' -P 'OR ("Org1MSP.member", "Org2MSP.member")'
 

@@ -24,6 +24,7 @@ type ChainCode struct {
 
 // 키 구조체
 type Truck struct {
+	ObjectType	string `json:"docType"` //  이 오브젝트 타입에 만든 구조체 이름을 넣으면 인덱스를 찾을 수 있음
 	Key string `json:"key"` // 키
 	StartPoint string `json:"startpoint"` // 출발지
 	EndPoint string `json:"endpoint"` // 도착지 
@@ -58,7 +59,9 @@ func (s *ChainCode) Invoke(APIstub shim.ChaincodeStubInterface) sc.Response {
 		return s.getAllTruck(APIstub)
 	} else if function == "getHistory" {
 		return s.getHistory(APIstub, args)
-	} 
+	} else if function == "getBatteryValue" {
+		return s.getBatteryValue(APIstub, args)
+	}
 
 	return shim.Error("Invalid Smart Contract function name.")
 }
@@ -81,31 +84,23 @@ func (s *ChainCode) addTruck(APIstub shim.ChaincodeStubInterface, args []string)
 	if len(args) != 8 {
 		return shim.Error("Incorrect number of arguments. Expecting 8")
 	}
-	// 유저 정보 가져오기
-	// userAsBytes, err := APIstub.GetState(args[0])
-	// if err != nil{
-	// 	jsonResp := "\"Error\":\"Failed to get state for "+ args[0]+"\"}"
-	// 	return shim.Error(jsonResp)
-	// } else if userAsBytes == nil{ // no State! error
-	// 	jsonResp := "\"Error\":\"User does not exist: "+ args[0]+"\"}"
-	// 	return shim.Error(jsonResp)
-	// }
-	// 상태 확인
-	// truck := Truck{}
-	// err = json.Unmarshal(userAsBytes, &truck)
-	// if err != nil {
-	// 	return shim.Error(err.Error())
-	// }
 
-	// 배터리 구조체 값 업데이트
-	// avg, _ := strconv.ParseFloat(args[6],64)
-	// truck.Average=append(truck.Average,avg)
-	var data = Truck{Key:args[0],StartPoint:args[1], EndPoint:args[2], CarWeight:args[3], Car:args[4], Weight:args[5], TransPort:args[6], Cost:args[7], Average:args[7] , Date:time.Now().Format("20060102150405") }
+	var data = Truck{ObjectType: "Truck",Key:args[0],StartPoint:args[1], EndPoint:args[2], CarWeight:args[3], Car:args[4], Weight:args[5], TransPort:args[6], Cost:args[7], Average:args[7] , Date:time.Now().Format("20060102150405") }
 	userAsBytes,_:=json.Marshal(data)
 
 	// 월드스테이드 업데이트 
-	// userAsBytes, err = json.Marshal(truck);
 	APIstub.PutState(args[0], userAsBytes)
+
+	indexName := "startpoint~id"
+	startpointidIndexKey, err := APIstub.CreateCompositeKey(indexName, []string{data.StartPoint, data.Key})
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+	//  Save index entry to state. Only the key name is needed, no need to store a duplicate copy of the marble.
+	//  Note - passing a 'nil' value will effectively delete the key from state, therefore we pass null character as value
+	value := []byte{0x00}
+	APIstub.PutState(startpointidIndexKey, value)
+
 
 	return shim.Success([]byte("rating is updated"))
 
@@ -159,8 +154,65 @@ func (s *ChainCode) getAllTruck(APIstub shim.ChaincodeStubInterface) sc.Response
 	return shim.Success([]byte(buffer))
 }
 
+
+//밸류 조회
+func (s *ChainCode) getBatteryValue(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
+	if len(args) != 1 {
+		return shim.Error("Incorrect number of arguments. Expecting 1")
+	}
+	value := args[0]
+	queriedIdByValueIterator, err := APIstub.GetStateByPartialCompositeKey("startpoint~id", []string{value})
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+	defer queriedIdByValueIterator.Close()
+
+
+	var buffer string
+	buffer = "["
+	bArrayMemberAlreadyWritten := false
+	
+	var i int
+
+	for i = 0; queriedIdByValueIterator.HasNext(); i++ {
+		response, err := queriedIdByValueIterator.Next()
+		if err != nil {
+			return shim.Error(err.Error())
+		}
+
+		objectType, compositeKeyParts, err := APIstub.SplitCompositeKey(response.Key)
+		if err != nil {
+			return shim.Error(err.Error())
+		}
+
+		returnedName := compositeKeyParts[0]
+		returnedKey := compositeKeyParts[1]
+
+		fmt.Printf("- found a key from index:%s name:%s key:%s\n", objectType, returnedName, returnedKey)
+		if bArrayMemberAlreadyWritten == true {
+			buffer += ", "
+		}
+
+		truckAsBytes, err := APIstub.GetState(returnedKey)
+		if err != nil {
+			return shim.Error(err.Error())
+		}
+
+		buffer += string(truckAsBytes)
+		bArrayMemberAlreadyWritten = true
+	}
+
+	buffer += "]"
+
+	return shim.Success([]byte(buffer))
+}
+
+
+
+
+
 // 키 이력 조회
-func (s *ChainCode) getHistory(stub shim.ChaincodeStubInterface, args []string) sc.Response {
+func (s *ChainCode) getHistory(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
 
 	if len(args) < 1 {
 		return shim.Error("Incorrect number of arguments. Expecting 1")
@@ -170,7 +222,7 @@ func (s *ChainCode) getHistory(stub shim.ChaincodeStubInterface, args []string) 
 
 	fmt.Printf("- start getHistoryForBattery: %s\n", truckName)
 
-	resultsIterator, err := stub.GetHistoryForKey(truckName)
+	resultsIterator, err := APIstub.GetHistoryForKey(truckName)
 	if err != nil {
 		return shim.Error(err.Error())
 	}

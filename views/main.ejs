@@ -13,7 +13,7 @@
     <button id='delcargo'>화물 등록 취소</button>
     <button id='callcargo'>운송 내역 조회</button>
     <button id='token'>토큰 구매</button>
-
+    <button id='hi'>Hi</button>
 
     <!-- Enroll Cargo -->
     <div id="cargoModal" class="modal">
@@ -39,5 +39,16 @@
     </div>
 
 </body>
+<script>
+  $('#hi').click(() => {
+    try {
+      let response = await fet('localhost:3000:/asd', {
+        method: 'get'
+      });
+    } catch (err) {
+
+    }
+  })
+</script>
 <%- include ../public/javascripts/modal.ejs %>
 </html>

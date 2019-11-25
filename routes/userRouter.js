@@ -14,6 +14,7 @@ userRouter.use(session({
 
 //Middleware
 var userModel = require('../model/userModel');
+var ccModel = require('../model/ccModel');
 
 userRouter.get('/', (req, res, next) => {
     res.render('index.ejs');
@@ -55,6 +56,15 @@ userRouter.post('/delcargo', async (req, res) => {
         //get Company index number -> select enrolled cargo list
     } catch (err) {
 
+    }
+});
+
+userRouter.get('/asd', async (req, res) => {
+    try {
+        var result = await ccModel.getTruckByValue();
+        
+    } catch (err) {
+        
     }
 })
 
