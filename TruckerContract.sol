@@ -55,7 +55,7 @@ contract TruckerContract {
     struct Payment {
         uint price;
         address payable truckerAddress;
-        address payable comapnyAddress;
+        address payable companyAddress;
         State state;
     }
 
@@ -90,18 +90,11 @@ contract TruckerContract {
     }
 
 
-    //물품 갯수 불러오기
-    function _get_product_count() view public isZeroId(productId) returns (uint)  { 
-        return productId-1;
-    }
-
-
     /*
     ============================상차지 부분================================
     */
     //상차지에 물건을 실을때.
     function _load_up_product(address payable _companyAddress, address payable _truckerAddress, uint _price) public payable {
-        require(_productId <= _get_product_count());
         require(companyList[_companyAddress].ableBalance >= companyList[_companyAddress].ableBalance - _price);
         require( (companyList[_companyAddress].ableBalance - _price) >= 0 );
         companyList[_companyAddress].paymentArray.push(paymentId);
@@ -121,12 +114,10 @@ contract TruckerContract {
     }
 
     //하차지에 물건을 내릴때
-    function _load_down_product(uint _payId) public 
-    isPurchaseCompletion(payList[_payId].state) isOverPayment(_payId) {
+    function _load_down_product(uint _payId) public  {
         trcTokenContract.transferFrom(payList[_payId].companyAddress, payList[_payId].companyAddress, 
         payList[_payId].truckerAddress, payList[_payId].price);
         payList[_payId].state = State.DOWN_CHECK;
-        companyList[payList[_payId].companyAddress].ableBalance += payList[_payId].price;
         emit evtDownLoadProductFromTrucker();
     }
 
@@ -134,11 +125,10 @@ contract TruckerContract {
     ===========================토큰 구매 부분============================
     */
     //토큰 구매
-    //web에서 현금만큼만 구매할 수 있도록 제어 해줘야함.
     function _token_purchase(address _companyAddress, uint _value) public {
         trcTokenContract.approve(deployer, _companyAddress, _value);
         trcTokenContract.transferFrom(deployer, _companyAddress, _companyAddress, _value);
-        userLcompanyListist[_companyAddress].ableBalance += _value;
+        companyList[_companyAddress].ableBalance += _value;
     }
 
 
@@ -152,6 +142,20 @@ contract TruckerContract {
     //Real Balance get
     function _get_balanceOf(address _address) public view returns (uint balance) {
         return trcTokenContract.balanceOf(_address);
+    }
+    
+    
+    function _add_payid() private {
+        paymentId++;
+    }
+    //결제내역 갯수 불러오기
+    function _get_payment_count() view public isZeroId(productId) returns (uint) { 
+        return paymentId-1;
+    }
+    
+    //물품 갯수 불러오기
+    function _get_product_count() view public isZeroId(productId) returns (uint)  { 
+        return productId-1;
     }
 
 }
