@@ -34,6 +34,10 @@ docker exec cli peer chaincode query -C trucker -n cargo -c '{"Args":["getAllTru
 docker exec cli peer chaincode query -C trucker -n cargo -c '{"Args":["getHistory","00000000000"]}'
 docker exec cli peer chaincode query -C trucker -n cargo -c '{"Args":["getBatteryValue","인천"]}'
 
+docker exec cli peer chaincode invoke -o orderer.trucker.com:7050 -C trucker -n cargo -c '{"Args":["addGeo","서울"]}'
+docker exec cli peer chaincode invoke -o orderer.trucker.com:7050 -C trucker -n cargo -c '{"Args":["addAverage","서울","50000"]}'
+docker exec cli peer chaincode query -C trucker -n cargo -c '{"Args":["getAverage","서울"]}'
+
 docker exec cli peer chaincode upgrade -v 1.1 -C trucker -n cargo -c '{"Args":["Init"]}' -P 'OR ("Org1MSP.member", "Org2MSP.member")'
 
 echo '-------------------------------------END-------------------------------------'
