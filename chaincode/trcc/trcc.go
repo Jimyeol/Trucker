@@ -6,7 +6,7 @@ import (
 	// "bytes"
 	"time"
 	"strconv"
-
+	"strings"
 
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 	sc "github.com/hyperledger/fabric/protos/peer"
@@ -89,6 +89,13 @@ func (s *ChainCode) addTruck(APIstub shim.ChaincodeStubInterface, args []string)
 
 	var data = Truck{ObjectType: "Truck",Key:args[0],StartPoint:args[1], EndPoint:args[2], CarWeight:args[3], Car:args[4], Weight:args[5], TransPort:args[6], Money:args[7], Average:args[7] , Date:time.Now().Format("20060102150405") }
 	userAsBytes,_:=json.Marshal(data)
+
+
+
+	geo_cut := strings.Fields(args[1])
+
+	s.addAverage(APIstub, []string{geo_cut[0]})
+
 
 	// 월드스테이드 업데이트 
 	APIstub.PutState(args[0], userAsBytes)
@@ -254,6 +261,8 @@ func (s *ChainCode) getHistory(APIstub shim.ChaincodeStubInterface, args []strin
 	return shim.Success([]byte(buffer))
 }
 
+// 지역(키) 추가
+
 func (s *ChainCode) addGeo(APIstub shim.ChaincodeStubInterface, args []string) sc.Response {
 
 	if len(args) != 1 {
@@ -279,16 +288,37 @@ func (s *ChainCode) addAverage(APIstub shim.ChaincodeStubInterface, args []strin
 		jsonResp := "\"Error\":\"Failed to get state for "+ args[0]+"\"}"
 		return shim.Error(jsonResp)
 	} else if avgAsBytes == nil{ // no State! error
-		jsonResp := "\"Error\":\"User does not exist: "+ args[0]+"\"}"
-		return shim.Error(jsonResp)
+		
+		s.addGeo(APIstub, []string{args[0]})
+		
+		Avg := GeoAvg{}
+
+		// 이전 데이터 저장
+		err = json.Unmarshal(avgAsBytes, &Avg)
+		
+		// 새로운 데이터 저장
+		Avg.Geo=args[0]
+		newCost,_ := strconv.ParseInt(args[1],0,64)
+		costCount := int64(len(Avg.Cost))
+		var cost = Cost{Money:newCost}
+		Avg.Cost=append(Avg.Cost,cost)
+		Avg.Average = (costCount*Avg.Average+newCost)/(costCount+1)
+	
+		
+		avgAsBytes, err = json.Marshal(Avg);
+	
+		APIstub.PutState(args[0], avgAsBytes)
+	
+		return shim.Success([]byte("avg is updated"))
 	}
 
 	// 평균금액 구조체 선언
-
-
 	Avg := GeoAvg{}
+
+	// 이전 데이터 저장
 	err = json.Unmarshal(avgAsBytes, &Avg)
 	
+	// 새로운 데이터 저장
 	Avg.Geo=args[0]
 	newCost,_ := strconv.ParseInt(args[1],0,64)
 	costCount := int64(len(Avg.Cost))
@@ -296,7 +326,7 @@ func (s *ChainCode) addAverage(APIstub shim.ChaincodeStubInterface, args []strin
 	Avg.Cost=append(Avg.Cost,cost)
 	Avg.Average = (costCount*Avg.Average+newCost)/(costCount+1)
 
-	// update to User World state
+	
 	avgAsBytes, err = json.Marshal(Avg);
 
 	APIstub.PutState(args[0], avgAsBytes)

@@ -28,15 +28,15 @@ docker exec cli peer chaincode install -n truck -v 1.0 -p github.com/trcc/
 
 docker exec cli peer chaincode instantiate -v 1.0 -C trucker -n cargo -c '{"Args":["Init"]}' -P 'OR ("Org1MSP.member", "Org2MSP.member")'
 # docker exec cli peer chaincode invoke -o orderer.trucker.com:7050 -C trucker -n cargo -c '{"Args":["addUser","00000000000"]}'
-docker exec cli peer chaincode invoke -o orderer.trucker.com:7050 -C trucker -n cargo -c '{"Args":["addTruck","00000000000","인천","서울","1T","트럭","300kg","편도","70000"]}'
+docker exec cli peer chaincode invoke -o orderer.trucker.com:7050 -C trucker -n cargo -c '{"Args":["addTruck","00000000000","서울특별시 강남구","서울","1T","트럭","300kg","편도","70000"]}'
 docker exec cli peer chaincode query -C trucker -n cargo -c '{"Args":["getTruck","00000000000"]}'
 docker exec cli peer chaincode query -C trucker -n cargo -c '{"Args":["getAllTruck"]}'
 docker exec cli peer chaincode query -C trucker -n cargo -c '{"Args":["getHistory","00000000000"]}'
 docker exec cli peer chaincode query -C trucker -n cargo -c '{"Args":["getBatteryValue","인천"]}'
 
-docker exec cli peer chaincode invoke -o orderer.trucker.com:7050 -C trucker -n cargo -c '{"Args":["addGeo","서울"]}'
-docker exec cli peer chaincode invoke -o orderer.trucker.com:7050 -C trucker -n cargo -c '{"Args":["addAverage","서울","50000"]}'
-docker exec cli peer chaincode query -C trucker -n cargo -c '{"Args":["getAverage","서울"]}'
+docker exec cli peer chaincode invoke -o orderer.trucker.com:7050 -C trucker -n cargo -c '{"Args":["addGeo","서울특별시 강남"]}'
+docker exec cli peer chaincode invoke -o orderer.trucker.com:7050 -C trucker -n cargo -c '{"Args":["addAverage","서울특별시","50000"]}'
+docker exec cli peer chaincode query -C trucker -n cargo -c '{"Args":["getAverage","서울특별시"]}'
 
 docker exec cli peer chaincode upgrade -v 1.1 -C trucker -n cargo -c '{"Args":["Init"]}' -P 'OR ("Org1MSP.member", "Org2MSP.member")'
 
